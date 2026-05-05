@@ -2,74 +2,148 @@
 
 A frame for drafting and reviewing proposals. Two modes:
 
-- **Author mode**: copy the template, fill each section. If you can't fill it, that's the gap to close before sending.
-- **Reviewer mode**: run the proposal through the questions in `## The reviewer pass`. Anything you can't answer from the doc is a comment for the author.
+- **Author mode**: copy the template, fill the sections that apply. If you can't fill a required section, that's the gap to close before sending.
+- **Reviewer mode**: run the proposal through `## The reviewer pass`. Anything you can't answer from the doc is a comment for the author.
 
-The frame works for technical proposals, strategy memos, and quarterly bets. It does not replace an RFC for design specifics, but feeds into one.
+---
+
+## When to use this frame vs. another
+
+This frame is the default for internal technical proposals. Pick a different one when:
+
+- Customer-facing launch or product positioning → `PRFAQ.md` (working backwards from a press release)
+- Feature work with elastic scope, fixed time → `SHAPE_UP.md` (appetite-first)
+- Leadership memo or board deck where the reader will skim → `PYRAMID.md` (claim-first, MECE arguments)
+- Multi-quarter bet or one-way-door decision → `PREMORTEM.md` (failure-first)
+
+## When to skip the frame entirely
+
+For changes under a day of work, fully reversible refactors, or routine tech-debt fixes, write a paragraph in Slack or in the PR description. The frame is overhead for trivial work.
+
+---
+
+## How to read the section tags
+
+Each section in the template is tagged so you know whether to include it:
+
+- **[Always]** - every proposal needs this section
+- **[Most]** - skip only with an explicit reason stated in the doc
+- **[When applicable]** - include only when the trigger condition (noted in the section) applies
 
 ---
 
 ## The author template
 
-Copy from here down. Each section has a prompt in italics - delete the italics when you fill it in.
+Copy from here down. Italic prompts get deleted on fill.
 
-### TL;DR
+### TL;DR  *[Always]*
 
-*Three sentences max. Sentence 1: what you're proposing. Sentence 2: why now. Sentence 3: what you need from the reader (approve, headcount, alignment, sign-off). If the reader stops here, they should know what's being asked.*
+*Three sentences max. Sentence 1: what you're proposing in concrete terms. Sentence 2: the cost (people, weeks, $). Sentence 3: the one-line ask. The structured fields - decider, owner, deadline, what unblocks on yes - live in `Decision requested`; the urgency case lives in `Why now`. If the reader stops here, they should know what's being asked and what it costs.*
 
-### Problem
+### Audience and decision maker  *[When applicable: SRE, security, legal, finance, or another team can block; or the decider is not your direct manager]*
 
-*What's broken, for whom, with what evidence. Numbers, tickets, customer quotes, incident counts. If the only evidence is "we keep hearing", say so and flag it as the first thing to instrument.*
+*Who is this written for, and who decides? Name the approver explicitly. List who is consulted (input expected) vs. informed (no input needed). If the audience is your immediate team and the decider is your manager, skip this section.*
 
-### Why now
+- Decider:
+- Consulted:
+- Informed:
 
-*What changes if we wait one quarter, two quarters. If "now" is not load-bearing, say "this can wait" and propose a later slot. Honest timing beats fake urgency.*
+### Problem  *[Always]*
 
-### Goal and success metric
+*What's broken, for whom, with what evidence. Numbers, tickets, customer quotes, incident counts. If the only evidence is "we keep hearing", a measurement milestone (instrument and quantify) precedes any build milestone in `Plan and sequencing` - no exceptions.*
 
-*One north-star metric. Current value, target, date. If the current value is unknown, the first milestone is measuring it. Avoid vanity metrics - pick the one that, if it moves, the business notices.*
+### Why now  *[Most]*
 
-| Metric | Today | Target | By when |
-| --- | --- | --- | --- |
-|  |  |  |  |
+*What changes if we wait one quarter, two quarters. If "now" is not load-bearing, say "this can wait" and propose a later slot.*
 
-### Options considered
+### Goal, success metric, and guardrail  *[Always]*
 
-*2-3 alternatives that a thoughtful peer would propose, including "do nothing" or "do the cheap version first". For each: one line on the option, one line on why it loses. If you can't name a real alternative, you haven't thought hard enough yet.*
+*One north-star metric the business would notice if it moved, plus one guardrail metric that must NOT regress (the "what we'd be embarrassed to game" line). Current value, target, date for each. If current value is unknown, measuring it is M1. Concrete: good = "p95 trial-to-paid time, 14d → 7d, by Q3"; bad = "improve activation".*
 
-- Option A:
-- Option B:
-- Option C (do nothing / minimal version):
+| Metric | Role | Today | Target | By when |
+| --- | --- | --- | --- | --- |
+|  | north-star |  |  |  |
+|  | guardrail |  |  |  |
 
-### Recommended approach
+### Options considered  *[Always]*
 
-*The pick. One paragraph on the shape of the work. Call out which parts are conventional and which are bets.*
+*2-3 alternatives a thoughtful peer would actually propose, including "do nothing" or "do the cheap version first". For each: one line on the option, and a named cost dimension on which it loses (latency, headcount, blast radius, time-to-ship, vendor risk). "Worse" without a dimension is a strawman.*
 
-### Plan and sequencing
+- Option A - loses on:
+- Option B - loses on:
+- Option C (do nothing / minimal version) - loses on:
 
-*Milestones with dates. The first milestone should be the cheapest experiment that proves or kills the approach - if it fails, we stop. Name the kill criteria explicitly.*
+### Recommended approach  *[Always]*
 
-- M1 (week X): ... - kill criteria: ...
-- M2 (week Y): ...
-- M3 (week Z): ...
+*The pick. One paragraph on the shape of the work. Separate the conventional parts from the bets - load-bearing assumptions that would invalidate the approach if wrong.*
 
-### Cost
+### Reversibility  *[Always]*
 
-*People (names or roles, FTEs), weeks, $ if relevant. Opportunity cost: what we won't do because we're doing this. If you don't know the cost, the proposal isn't ready - rough is fine, missing is not.*
+*Yes or no: are any decisions here irreversible (public API shape, data model, tenant identity, customer-visible contract, schema migration, vendor lock-in)? If no, write one line saying so. If yes, list each one-way door, and answer: what does this make harder later (future optionality lost, migrations the next team inherits, adjacent systems constrained)? Reversible calls take minutes; irreversible ones get 10x scrutiny.*
 
-### Risks of doing it
+### Out of scope  *[Most]*
 
-*How this fails. Technical risks, organizational risks, customer-facing risks. For each, one line on how we'd notice and one line on the rollback. "Risks of not doing it" lives in `Why now`, not here.*
+*Things that look in-scope but aren't. Naming them up front prevents mid-flight scope creep and tells reviewers what they don't need to debate here.*
 
-- Risk:  | Detect by:  | Mitigation / rollback:
+- Not doing:
+- Not deciding now:
 
-### Reversibility
+### Plan and sequencing  *[Most]*
 
-*Which decisions are one-way doors (public API shape, data model, tenant identity, customer-visible contract, schema migration). Anything reversible can be decided fast. One-way doors get 10x more scrutiny.*
+*Milestones, each with a description and target date. The first milestone should be the cheapest experiment that proves or kills the approach - if it fails, we stop. Name the kill criteria explicitly.*
 
-### Decision requested
+- M1 - description (target: date) - kill criteria:
+- M2 - description (target: date):
+- M3 - description (target: date):
 
-*What you need from the reader. Be specific: "approve N FTEs for Q3", "sign off on architecture", "align on metric definition", "block on customer comms". If there is no ask, this is a status update, not a proposal.*
+### Cost  *[Always]*
+
+*Two kinds, both required:*
+
+- *Build cost: people (names or roles, FTEs), weeks, $ if relevant.*
+- *Ongoing cost after ship: maintenance load, on-call burden, infra spend, vendor renewal, deprecation tax. Who owns it, for how long.*
+
+*Plus opportunity cost: what we won't do because we're doing this. Rough is fine, missing is not.*
+
+### Stakeholders to align  *[When applicable: another team must do work or sign off, or external functions like security, legal, SRE, finance, customer success can block]*
+
+*Who can block this or needs to know before it ships. For each: what they need from us, and when.*
+
+| Stakeholder | What they need | By when |
+| --- | --- | --- |
+|  |  |  |
+
+### Risks of doing it  *[Always]*
+
+*How this fails. Technical, organizational, customer-facing. For each risk, give it a name and answer two questions: how would we notice, and what's the rollback. "Risks of not doing it" lives in `Why now`, not here.*
+
+**Risk 1: [name]**
+- Owner:
+- Detect by:
+- Mitigation / rollback:
+
+**Risk 2: [name]**
+- Owner:
+- Detect by:
+- Mitigation / rollback:
+
+### Open questions  *[When applicable: you have unresolved questions you want reviewer input on]*
+
+*Questions you don't know the answer to. Each should be answerable, not rhetorical: "should we require SSO for trial accounts" not "is this a good idea". Also note: who pushed back during drafting, and what did you change in response? If nobody pushed back, you didn't show it widely enough.*
+
+- Q1:
+- Q2:
+- Pushback received and resolved:
+
+### Decision requested  *[Always]*
+
+*The structured ask. The TL;DR carried the one-line version; this is where it gets specific enough to act on. If there is no ask, this is a status update, not a proposal.*
+
+- Decider:
+- Owner / DRI (runs the work post-approval):
+- Decision needed by:
+- On approval:
+- If declined or blocked:
 
 ---
 
@@ -77,17 +151,24 @@ Copy from here down. Each section has a prompt in italics - delete the italics w
 
 Run these against any proposal you're reviewing. A "no" or "can't tell" is a comment for the author.
 
+### Blockers (missing answers should send the proposal back)
+
 1. **Buried lede.** Does the first paragraph say what's being proposed and what it costs? If the load-bearing point is in section 4, send it back.
-2. **Problem evidence.** Is there a number, ticket, or quote? Or is it vibes? Vibes are a fine starting point but should be named as such.
+2. **Problem evidence.** Is there a number, ticket, or quote, or is it vibes? Vibes-only must trigger a measurement milestone before any build milestone.
 3. **"Why now" is real.** What breaks if this slips a quarter? If the answer is "nothing concrete", the urgency is manufactured.
-4. **Metric is load-bearing.** If the metric moves, would the business notice? Or is it a proxy that nobody acts on?
-5. **Alternatives are real, not strawmen.** Are the rejected options ones a thoughtful peer would actually propose? Is "do the cheap version first" considered? If alternatives are missing, the recommendation isn't trustworthy yet.
-6. **Kill criteria exist.** Does the first milestone have a defined way to fail? Plans without kill criteria turn into 6-month commitments by default.
-7. **Cost is sized.** People, weeks, opportunity cost. Rough is fine. Missing is a blocker.
-8. **Pre-mortem the recommendation.** Imagine it shipped and failed in 6 months - what's the most likely cause? Is that cause addressed in `Risks`?
-9. **Who pays, who benefits.** Same team? Different teams? If different, is the paying team aligned?
-10. **One-way doors flagged.** Are the irreversible parts called out separately, or buried?
-11. **Decision is specific.** Does the reader know what to do Monday morning if they say yes? If they say no, what's blocked?
+4. **Metric and guardrail.** If the north-star moves, would the business notice? Is there a guardrail that catches gaming the north-star?
+5. **Alternatives are real, not strawmen.** Does each rejected option name a specific cost dimension on which it loses?
+6. **Cost is sized - build and ongoing.** Build cost (people, weeks). Ongoing cost (maintenance, on-call, infra) with an owner. Missing either is a blocker.
+7. **Decision is specific.** Decider AND DRI named? Does the reader know what to do Monday morning on yes? What's blocked on no?
+8. **Kill criteria exist.** Does the first milestone have a defined way to fail? Plans without kill criteria turn into 6-month commitments by default.
+9. **Who pays, who benefits.** If the paying team and the benefiting team differ, is the paying team aligned? Is `Stakeholders to align` complete?
+10. **Pre-mortem when reversible=no.** If `Reversibility` lists any one-way door, has the most likely 6-month-failure cause been imagined and addressed in `Risks`? If yes is the answer to reversibility and this isn't done, send it back.
+
+### Polish (raises quality but not show-stoppers)
+
+11. **Out of scope is real.** Does the no-gos list prevent actual likely creep, or is it generic?
+12. **Open questions are answerable.** Are they specific enough that a reviewer can give a useful answer?
+13. **Pushback is shown.** Did anyone push back during drafting, and is the resolution captured?
 
 ---
 
@@ -98,10 +179,13 @@ Run these against any proposal you're reviewing. A "no" or "can't tell" is a com
 - **Vague baselines**: "some", "manually tracked", "baseline". Lock these down before sending.
 - **Recommendation buried at the end.** Lead with the pick, then justify.
 - **Risks of not doing it, but no risks of doing it.** Both lists must exist.
-- **No cost section.** The most common failure mode. A proposal without cost is a wishlist.
+- **No cost section.** A proposal without cost is a wishlist.
 - **Customer quotes with no source.** Attribute or drop.
-- **"Self-healing stays a slide" style claims.** If you're going to make a claim about the status quo, measure it or stop making it.
+- **Unmeasured status-quo claims.** If you make a claim about how the system behaves today, measure it or stop making it.
 - **Metric named in TL;DR, never reconnected.** If the headline metric appears once and never traces to the workstreams, the workstreams aren't actually about that metric.
+- **Passive voice hiding the owner.** "It will be migrated", "the system will be updated". Name who.
+- **Risks listed without owners.** A risk no one owns is a risk no one watches.
+- **Dependencies on un-consulted teams.** If team X must do work and they're listed as `Informed`, that's a fiction.
 
 ---
 
@@ -109,7 +193,7 @@ Run these against any proposal you're reviewing. A "no" or "can't tell" is a com
 
 The frame above is the default pass. For higher-stakes proposals, layer on:
 
-- **Pre-mortem** before committing to a multi-quarter initiative or a one-way door. Imagine failure, walk back the causes, fund the top 1-2 pre-actions.
-- **Red team** before shipping a non-trivial design or sending the proposal to leadership. Adversarial pass on assumptions, dependencies, and failure modes.
+- **Pre-mortem** before committing to a multi-quarter initiative or a one-way door. See `PREMORTEM.md` for a full failure-first frame.
+- **Red team** before shipping a non-trivial design or sending to leadership. Adversarial pass on assumptions, dependencies, and failure modes.
 - **Council** when the decision involves a real cross-functional tradeoff. Surface disagreement explicitly, name who bears the cost.
 - **First principles** when "we've always done it this way" is doing the heavy lifting in the recommendation.
